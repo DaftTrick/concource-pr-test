@@ -1,3 +1,3 @@
-task :default do
+task :hello do
   puts 'Hello World!'
 end
