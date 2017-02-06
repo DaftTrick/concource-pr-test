@@ -16,8 +16,13 @@ jobs:
   - name: test-pr
     plan:
       - get: project-prs
-          trigger: true
-          version: every
+        trigger: true
+        version: every
+      - put: project-prs
+        params:
+          path: project-prs
+          status: pending
+          context: role1
       - task: rspec
         privileged: true
         config:
@@ -37,8 +42,10 @@ jobs:
           params:
             path: project-prs
             status: success
+            context: role1
         on_failure:
           put: project-prs
           params:
             path: project-prs
             status: failure
+            context: role1
