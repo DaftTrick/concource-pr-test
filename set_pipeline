@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+FLY_TEAM="devops"
+FLY_ATC="http://172.17.69.30"
+
+# ensure we are logged in
+if ! fly -t "${FLY_TEAM}" workers >/dev/null 2>&1; then
+    echo "please login to the ${FLY_TEAM} team ..."
+    fly -t "${FLY_TEAM}" login \
+        --concourse-url "${FLY_ATC}" \
+        --team-name "${FLY_TEAM}"
+fi
+
+# set the pipeline
+fly -t devops set-pipeline \
+    --pipeline="pr-test" \
+    --config="${DIR}/pipeline.yml" \
+    --load-vars-from="${DIR}/secrets.yml" \
+    --non-interactive

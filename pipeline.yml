@@ -13,7 +13,7 @@ resources:
     private_key: {{github_private_key}}
 
 jobs:
-  - name: test-pr
+  - name: test-pr-vmware
     plan:
       - get: project-prs
         trigger: true
@@ -21,8 +21,8 @@ jobs:
       - put: project-prs
         params:
           path: project-prs
-          status: pending
-          context: role1
+          status: success
+          context: role2
       - task: rspec
         privileged: true
         config:
