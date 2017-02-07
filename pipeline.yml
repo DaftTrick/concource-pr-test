@@ -11,7 +11,8 @@ resources:
     repo: DaftTrick/concource-pr-test
     access_token: {{github_access_token}}
     private_key: {{github_private_key}}
-    paths: spec/role1
+    paths:
+      - spec/role1/*
 
 jobs:
 - name: test-pr-vmware-role1
@@ -89,7 +90,7 @@ jobs:
         context: aws
 
 groups:
-- name: develop
+- name: Pull requests
   jobs:
   - test-pr-aws-role1
   - test-pr-vmware-role1
