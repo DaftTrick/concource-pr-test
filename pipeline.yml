@@ -11,41 +11,86 @@ resources:
     repo: DaftTrick/concource-pr-test
     access_token: {{github_access_token}}
     private_key: {{github_private_key}}
+    paths:
+      - spec/role1/*
 
 jobs:
-  - name: test-pr-vmware
-    plan:
-      - get: project-prs
-        trigger: true
-        version: every
-      - put: project-prs
-        params:
-          path: project-prs
-          status: success
-          context: role2
-      - task: rspec
-        privileged: true
-        config:
-          image_resource:
-            type: docker-image
-            source:
-              repository: jtarchie/pr
-              tag: test
-          inputs:
-            - name: project-prs
-          platform: linux
-          run:
-            path: sh
-            args: ['-c', 'cd project-prs && bundle install && bundle exec rspec']
-        on_success:
-          put: project-prs
-          params:
-            path: project-prs
-            status: success
-            context: role1
-        on_failure:
-          put: project-prs
-          params:
-            path: project-prs
-            status: failure
-            context: role1
+- name: test-pr-vmware-role1
+  plan:
+  - get: project-prs
+    trigger: true
+    version: every
+  - put: project-prs
+    params:
+      path: project-prs
+      status: pending
+      context: vmware
+  - task: rspec
+    privileged: true
+    config:
+      image_resource:
+        type: docker-image
+        source:
+          repository: jtarchie/pr
+          tag: test
+      inputs:
+        - name: project-prs
+      platform: linux
+      run:
+        path: sh
+        args: ['-c', 'cd project-prs && bundle install && bundle exec rspec']
+    on_success:
+      put: project-prs
+      params:
+        path: project-prs
+        status: success
+        context: vmware
+    on_failure:
+      put: project-prs
+      params:
+        path: project-prs
+        status: failure
+        context: vmware
+
+- name: test-pr-aws-role1
+  plan:
+  - get: project-prs
+    trigger: true
+    version: every
+  - put: project-prs
+    params:
+      path: project-prs
+      status: pending
+      context: aws
+  - task: rspec
+    privileged: true
+    config:
+      image_resource:
+        type: docker-image
+        source:
+          repository: jtarchie/pr
+          tag: test
+      inputs:
+        - name: project-prs
+      platform: linux
+      run:
+        path: sh
+        args: ['-c', 'cd project-prs && bundle install && bundle exec rspec']
+    on_success:
+      put: project-prs
+      params:
+        path: project-prs
+        status: success
+        context: aws
+    on_failure:
+      put: project-prs
+      params:
+        path: project-prs
+        status: failure
+        context: aws
+
+groups:
+- name: Pull requests
+  jobs:
+  - test-pr-aws-role1
+  - test-pr-vmware-role1
